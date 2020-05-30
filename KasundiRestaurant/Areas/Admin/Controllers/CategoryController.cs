@@ -16,7 +16,7 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
         {
             _db = db;
         }
-        //GET
+        //GET 
         public async Task<IActionResult> Index()
         {
             return View(await _db.Category.ToListAsync());
