@@ -15,7 +15,7 @@
         </div>
 
         <div class="col-6 text-right">
-           <partial name="_CreateButtonPartial"/>
+            <partial name="_CreateButtonPartial" />
         </div>
 
     </div>
@@ -38,15 +38,16 @@
                             @Html.DisplayFor(m => item.Name)
                         </td>
                         <td>
-                            EDIT | DEL | DETALES
+                            <partial name="_TableButtonPartial" model="item.Id" />
                         </td>
                     </tr>
                 }
             </table>
         }
-        else {<p>
-    No category Exist
-</p> 
+        else
+        {<p>
+                No category Exist
+            </p>
         }
 
     </div>
