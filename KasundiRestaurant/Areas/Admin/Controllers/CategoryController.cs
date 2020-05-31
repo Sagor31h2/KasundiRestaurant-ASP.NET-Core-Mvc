@@ -54,5 +54,19 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
             }
             return View(category);
         }
+
+        //POST-EDIT
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Edit(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Update(category);
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(category);
+        }
     }
 }
