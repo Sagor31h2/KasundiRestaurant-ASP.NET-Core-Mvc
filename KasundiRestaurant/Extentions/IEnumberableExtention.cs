@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace KasundiRestaurant.Extentions
 {
     public static class IEnumberableExtention
-    { public static IEnumerable<SelectListItem> selectListItem<T>(this IEnumerable<T> items,int selectedValue)
+    { public static IEnumerable<SelectListItem> ToSelectListItem<T>(this IEnumerable<T> items,int selectedValue)
         {
             return from item in items
                    select new SelectListItem
