@@ -10,8 +10,10 @@ using Microsoft.EntityFrameworkCore;
 namespace KasundiRestaurant.Areas.Admin.Controllers
 {[Area("Admin")]
     public class SubCategoryController : Controller
-    {
+    { 
         private readonly ApplicationDbContext _db;
+
+        [TempData] public string StatusMessageSubCategory { get; set; }
 
         public SubCategoryController(ApplicationDbContext db)
         {
@@ -35,6 +37,36 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
             };
             return View(model);
 
+        }
+        //Post-CREATE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CategoryAndSubCategoryViewModel model)
+        {
+            var doesSubCategoryExists = _db.SubCategory.Include(s => s.Category)
+                .Where(p => p.Name==model.SubCategory.Name && p.Category.Id == model.SubCategory.CategoryId);
+            if (doesSubCategoryExists.Count()>0)
+            {
+                //Error
+                StatusMessageSubCategory = "Error:SubCategory Exists Under " +
+                                doesSubCategoryExists.First().Category.Name +
+                                " category.Please use another name";
+            }
+            else
+            {
+                _db.SubCategory.Add(model.SubCategory);
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            var modelVM = new CategoryAndSubCategoryViewModel()
+            {
+                CategoryList = await _db.Category.ToListAsync(),
+                SubCategory = new Models.SubCategory(),
+                SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).
+                    Select(p => p.Name).ToListAsync(),
+                StatusMessage = StatusMessageSubCategory
+            };
+            return View(modelVM);
         }
     }
 }

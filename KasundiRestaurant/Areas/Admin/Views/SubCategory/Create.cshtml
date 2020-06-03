@@ -8,7 +8,10 @@
 <br />
 <h1>Create Category</h1>
 <br />
-<div class="border backgrondwhite">
+
+<partial name="~/Areas/Identity/Pages/Account/_StatusMessage.cshtml" model="Model.StatusMessage"/>
+
+<div class="border backgrondwhite row ">
     <div class="col-8 border-right">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
