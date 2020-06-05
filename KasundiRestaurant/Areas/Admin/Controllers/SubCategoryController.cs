@@ -156,5 +156,33 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
             return View(subCategory);
         }
 
+        //GET_DELETE
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var subcategory = await _db.SubCategory.Include(c => c.Category).SingleOrDefaultAsync(c => c.Id == id);
+            if (subcategory == null)
+            {
+                return NotFound();
+            }
+            return View(subcategory);
+        }
+
+        //POST-DELETE
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+           
+                var subCategory =await _db.SubCategory.SingleOrDefaultAsync(c => c.Id == id);
+                _db.SubCategory.Remove(subCategory);
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+        }
+
     }
 }
