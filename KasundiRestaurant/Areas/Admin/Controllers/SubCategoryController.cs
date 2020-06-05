@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using KasundiRestaurant.Data;
+using KasundiRestaurant.Models;
 using KasundiRestaurant.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace KasundiRestaurant.Areas.Admin.Controllers
@@ -67,6 +69,16 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
                 StatusMessage = StatusMessageSubCategory
             };
             return View(modelVM);
+        }
+
+        //GET-SUBCATEGORY
+        [ActionName("GetSubcategory")]
+        public async Task<IActionResult> GetSubCategory(int id)
+        {
+            var subCategories=new List<SubCategory>();
+            subCategories = await _db.SubCategory.Where(c => c.CategoryId == id).ToListAsync();
+
+            return Json(new SelectList(subCategories,"Id","Name"));
         }
     }
 }

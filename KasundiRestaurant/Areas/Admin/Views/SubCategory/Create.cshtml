@@ -57,3 +57,37 @@
     </div>
 
 </div>
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updateSubCategoryList() {
+            var categorySelected = document.getElementById("ddCategoryList").value;
+
+            $list = $('#SubCategoryList');
+
+            $.ajax({
+                url: '/Admin/SubCategory/GetSubCategory/' + categorySelected,
+                type: 'GET',
+                dataType: 'text',
+                success: function(data) {
+                    result = JSON.parse(data),
+                        $list.html('');
+                    $list.append('<ul class=:"list-group">');
+                    for (i in result) {
+                        $list.append('<li class="list-group-item">' + result[i].text + '</li>');
+                    }
+                    $list.append('</ul>');
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            updateSubCategoryList();
+        });
+        $("#ddCategoryList").on("change",
+            function() {
+                updateSubCategoryList();
+            });
+    </script>
+}
