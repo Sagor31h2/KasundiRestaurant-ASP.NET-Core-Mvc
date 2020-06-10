@@ -97,8 +97,34 @@
         tinymce.init({
             selector: 'textarea',
             plugin: "lists",
-            menubar:'file edit format'
+            menubar: 'file edit format'
         });
     </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            getSubCategory();
+            $('#CategoryId').change(function() {
+                getSubCategory();
+            });
+        });
+
+        function getSubCategory(parameters) {
+            var url = '@Url.Content("~/")' + "Admin/SubCategory/GetSubCategory";
+            var ddlsoruce = '#CategoryId';
+            $.getJSON(url,
+                { id: $(ddlsoruce).val() },
+                function(data) {
+                    var items = '';
+                    $('#SubCategoryId').empty();
+                    $.each(data,
+                        function(i, subcategory) {
+                            items += "<option value='" + subcategory.value + "'>" + subcategory.text + "</option>";
+                        });
+                    $('#SubCategoryId').html(items);
+                });
+        }
+    </script>
+
 }
 
