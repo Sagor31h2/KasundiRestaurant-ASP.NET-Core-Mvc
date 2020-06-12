@@ -124,7 +124,10 @@
                     $('#SubCategoryId').html(items);
                 });
         }
-    </script>
 
+    </script>
+    
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
+
 
