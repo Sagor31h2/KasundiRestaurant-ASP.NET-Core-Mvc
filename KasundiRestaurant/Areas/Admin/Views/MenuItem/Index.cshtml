@@ -50,15 +50,15 @@
                         </td>
                         
                         <td>
-                            @Html.DisplayFor(m => item.Name)
+                            @Html.DisplayFor(m => item.Price)
                         </td>
                         
                         <td>
-                            @Html.DisplayFor(m => item.Name)
+                            @Html.DisplayFor(m => item.Category.Name)
                         </td>
                         
                         <td>
-                            @Html.DisplayFor(m => item.Name)
+                            @Html.DisplayFor(m => item.SubCategory.Name)
                         </td>
                         <td>
                             <partial name="_TableButtonPartial" model="item.Id" />
