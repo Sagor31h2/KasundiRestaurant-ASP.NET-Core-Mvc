@@ -98,5 +98,88 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
         }
 
 
+        //GET-EDIT 
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id==null)
+            {
+                return NotFound();
+            }
+
+            MenuItemVM.MenuItem = await _db.MenuItem.Include(c => c.Category).Include(c => c.SubCategory)
+                .SingleOrDefaultAsync(c => c.Id == id);
+
+            MenuItemVM.SubCategories = await _db.SubCategory.Where(c => c.CategoryId == MenuItemVM.MenuItem.CategoryId)
+                .ToListAsync();
+            if (MenuItemVM.MenuItem==null)
+            {
+                return NotFound();
+            }
+
+            return View(MenuItemVM);
+        }
+
+        //POST-EDIT
+        [ActionName("Edit")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPost(int? id)
+        {
+            if (id==null)
+            {
+                NotFound();
+            }
+
+            MenuItemVM.MenuItem.SubCategoryId = Convert.ToInt32(Request.Form["SubCategoryId"].ToString());
+
+            if (!ModelState.IsValid)
+            {
+                MenuItemVM.SubCategories = await _db.SubCategory.Where(s => s.CategoryId == MenuItemVM.MenuItem.CategoryId).ToListAsync();
+                return View(MenuItemVM);
+            }
+
+            //upload new image
+            string webRootPath = _hostEnvironment.WebRootPath;
+            var files = HttpContext.Request.Form.Files;
+
+
+            var menuItemFormDb = await _db.MenuItem.FindAsync(id);
+
+            if (files.Count > 0)
+            {
+                //new file uploaded 
+                var uploads = Path.Combine(webRootPath, "Images");
+                var new_Extension = Path.GetExtension(files[0].FileName);
+
+                //Delete the original file
+                var imagePath = Path.Combine(webRootPath, menuItemFormDb.Image.TrimStart('\\'));
+
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                using (var fileStream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + new_Extension), FileMode.Create))
+                {
+                    files[0].CopyTo(fileStream);
+
+                }
+
+                menuItemFormDb.Image = @"\Images\" + MenuItemVM.MenuItem.Id + new_Extension;
+            }
+
+            menuItemFormDb.Name = MenuItemVM.MenuItem.Name;
+            menuItemFormDb.Description = MenuItemVM.MenuItem.Description;
+            menuItemFormDb.Price = MenuItemVM.MenuItem.Price;
+            menuItemFormDb.Spicyness = MenuItemVM.MenuItem.Spicyness;
+            menuItemFormDb.CategoryId = MenuItemVM.MenuItem.CategoryId;
+            menuItemFormDb.SubCategoryId = MenuItemVM.MenuItem.SubCategoryId;
+
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
     }
 }
