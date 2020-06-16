@@ -201,6 +201,50 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
             return View(MenuItemVM);
         }
 
+        //GET-DELETE 
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            MenuItemVM.MenuItem = await _db.MenuItem.Include(c => c.Category).Include(c => c.SubCategory)
+                .SingleOrDefaultAsync(c => c.Id == id);
+
+            MenuItemVM.SubCategories = await _db.SubCategory.Where(c => c.CategoryId == MenuItemVM.MenuItem.CategoryId)
+                .ToListAsync();
+            if (MenuItemVM.MenuItem == null)
+            {
+                return NotFound();
+            }
+
+            return View(MenuItemVM);
+        }
+        //POST-DELETE
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePost(int? id)
+        {
+            if (id == null)
+            {
+                NotFound();
+            }
+            string webRootPath = _hostEnvironment.WebRootPath;
+
+            var menuItem = await _db.MenuItem.FindAsync(id);
+
+            var imagePath = Path.Combine(webRootPath, menuItem.Image.TrimStart('\\'));
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+
+            _db.MenuItem.Remove(menuItem);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
 
     }
 }

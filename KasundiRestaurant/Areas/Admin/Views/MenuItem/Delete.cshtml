@@ -1,15 +1,15 @@
 ﻿@model KasundiRestaurant.Models.ViewModels.MenuItemViewModel
 @using KasundiRestaurant.Extentions
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Delete";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <br />
-<h2 class="text-info">Details MenuItem </h2>
+<h2 class="text-info">Delete MenuItem </h2>
 <br />
 
-<form enctype="multipart/form-data">
+<form asp-action="Delete" enctype="multipart/form-data">
     <!--white backgrounded shell-->
     <div class="border backgrondwhite row">
         <!--row 1-->
@@ -46,7 +46,7 @@
                 </div>
                 <span asp-validation-for="MenuItem.Price" class="text-danger"></span>
             </div>
-           
+
 
             <!--row5-->
             <div class="form-group row">
@@ -86,7 +86,7 @@
         <!--row7-->
         <div class="col-8">
             <div class="col-8 offset-4">
-                <partial name="_DetailsAndBackToListButton" model="Model.MenuItem.Id" />
+                <partial name="_DeleteAndBackToListButton" model="Model.MenuItem.Id" />
             </div>
         </div>
     </div>
