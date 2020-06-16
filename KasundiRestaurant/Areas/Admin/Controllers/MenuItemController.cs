@@ -180,6 +180,27 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        //GET-DETAILS 
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            MenuItemVM.MenuItem = await _db.MenuItem.Include(c => c.Category).Include(c => c.SubCategory)
+                .SingleOrDefaultAsync(c => c.Id == id);
+
+            MenuItemVM.SubCategories = await _db.SubCategory.Where(c => c.CategoryId == MenuItemVM.MenuItem.CategoryId)
+                .ToListAsync();
+            if (MenuItemVM.MenuItem == null)
+            {
+                return NotFound();
+            }
+
+            return View(MenuItemVM);
+        }
+
 
     }
 }
