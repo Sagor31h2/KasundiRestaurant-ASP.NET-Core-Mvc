@@ -116,5 +116,19 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
             return View();
         }
 
+        //GET-Details
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var couponById = await _db.Coupon.SingleOrDefaultAsync(c => c.Id == id);
+            if (couponById == null)
+            {
+                return NotFound();
+            }
+            return View(couponById);
+        }
     }
 }
