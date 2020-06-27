@@ -39,12 +39,12 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var files = HttpContext.Request.Form.Files;
-                if (files.Count>0)
+                if (files.Count > 0)
                 {
                     byte[] p1 = null;
-                    using (var fs1=files[0].OpenReadStream())
+                    using (var fs1 = files[0].OpenReadStream())
                     {
-                        using (var ms1=new MemoryStream())
+                        using (var ms1 = new MemoryStream())
                         {
                             fs1.CopyTo(ms1);
                             p1 = ms1.ToArray();
@@ -63,11 +63,11 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
         //GET-Edit
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id==null)
+            if (id == null)
             {
                 return NotFound();
             }
-            var couponById = await _db.Coupon.SingleOrDefaultAsync(c=>c.Id==id);
+            var couponById = await _db.Coupon.SingleOrDefaultAsync(c => c.Id == id);
             if (couponById == null)
             {
                 return NotFound();
@@ -80,7 +80,7 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Coupon coupons)
         {
-            if (coupons.Id==0)
+            if (coupons.Id == 0)
             {
                 return NotFound();
             }
@@ -129,6 +129,31 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
                 return NotFound();
             }
             return View(couponById);
+        }
+
+        //GET-Delete
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var couponById = await _db.Coupon.SingleOrDefaultAsync(c => c.Id == id);
+            if (couponById == null)
+            {
+                return NotFound();
+            }
+            return View(couponById);
+        }
+        //POST-Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var coupons = await _db.Coupon.SingleOrDefaultAsync(m => m.Id == id);
+            _db.Coupon.Remove(coupons);
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
