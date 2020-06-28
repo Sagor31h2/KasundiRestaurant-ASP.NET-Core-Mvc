@@ -3,24 +3,34 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using KasundiRestaurant.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using KasundiRestaurant.Models;
+using KasundiRestaurant.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace KasundiRestaurant.Controllers
-{[Area("Customer")]
+{
+    [Area("Customer")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _db;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext db)
         {
-            _logger = logger;
+            _db = db;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var IndexVM = new IndexViewModel()
+            {
+                MenuItems = await _db.MenuItem.Include(c => c.Category).Include(c => c.SubCategory).ToListAsync(),
+                Categories = await _db.Category.ToListAsync(),
+                Coupons = await _db.Coupon.Where(c => c.IsActive == true).ToListAsync()
+            };
+            return View(IndexVM);
         }
 
         public IActionResult Privacy()
