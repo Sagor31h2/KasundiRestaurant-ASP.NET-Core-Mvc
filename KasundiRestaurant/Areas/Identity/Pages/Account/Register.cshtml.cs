@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using KasundiRestaurant.Models;
+using KasundiRestaurant.Utility;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,17 +25,20 @@ namespace KasundiRestaurant.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
@@ -83,22 +88,61 @@ namespace KasundiRestaurant.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    City = Input.City,
+                    State = Input.State,
+                    StreetAddress = Input.StreetAddress,
+                    PhoneNumber = Input.PhoneNumber,
+                    Name = Input.Name,
+                    PostalCode = Input.PostalCode,
+
+                };
+
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    //new roles
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.ManagerUser))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.ManagerUser));
+                    }
+
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.CustomerEndUser))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.CustomerEndUser));
+                    }
+
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.KitchenUser))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.KitchenUser));
+                    }
+
+                    if (!await _roleManager.RoleExistsAsync(StaticDetails.FrontDeskUser))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(StaticDetails.FrontDeskUser));
+                    }
+
+                    //new roles end
+
+                    //admin
+                    await _userManager.AddToRoleAsync(user, StaticDetails.ManagerUser);
+
                     _logger.LogInformation("User created a new account with password.");
 
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code },
-                        protocol: Request.Scheme);
+                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    //var callbackUrl = Url.Page(
+                    //    "/Account/ConfirmEmail",
+                    //    pageHandler: null,
+                    //    values: new { area = "Identity", userId = user.Id, code = code },
+                    //    protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
