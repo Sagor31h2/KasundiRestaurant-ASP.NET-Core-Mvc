@@ -1,4 +1,5 @@
 ﻿@page
+@using KasundiRestaurant.Utility
 @model RegisterModel
 @{
     ViewData["Title"] = "Register";
@@ -114,6 +115,18 @@
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
         </div>
+        @if (User.IsInRole(StaticDetails.ManagerUser))
+        {
+            <div class="form-group row">
+                <div class="col-2">
+                </div>
+                <div class="col-5">
+                    <input type="radio" name="rdUserRole" value="@StaticDetails.KitchenUser" /> @StaticDetails.KitchenUser
+                    <input type="radio" name="rdUserRole" value="@StaticDetails.FrontDeskUser" /> @StaticDetails.FrontDeskUser
+                    <input type="radio" name="rdUserRole" value="@StaticDetails.ManagerUser" /> @StaticDetails.ManagerUser
+                </div>
+            </div>
+        }
 
 
 
