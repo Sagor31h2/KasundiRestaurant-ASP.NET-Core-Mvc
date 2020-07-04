@@ -84,6 +84,8 @@ namespace KasundiRestaurant.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            string role = Request.Form["rdUserRole"].ToString();
+
             returnUrl = returnUrl ?? Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
@@ -128,8 +130,33 @@ namespace KasundiRestaurant.Areas.Identity.Pages.Account
 
                     //new roles end
 
+                    if (role == StaticDetails.ManagerUser)
+                    {
+                        await _userManager.AddToRoleAsync(user, StaticDetails.ManagerUser);
+                    }
+                    else
+                    {
+                        if (role == StaticDetails.FrontDeskUser)
+                        {
+                            await _userManager.AddToRoleAsync(user, StaticDetails.FrontDeskUser);
+                        }
+                        else
+                        {
+                            if (role == StaticDetails.ManagerUser)
+                            {
+                                await _userManager.AddToRoleAsync(user, StaticDetails.ManagerUser);
+                            }
+                            else
+                            {
+                                await _userManager.AddToRoleAsync(user, StaticDetails.CustomerEndUser);
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+                                return LocalRedirect(returnUrl);
+
+                            }
+                        }
+                    }
+                    return RedirectToAction("Index", "User", new { area = "Admin" });
                     //admin
-                    await _userManager.AddToRoleAsync(user, StaticDetails.ManagerUser);
 
                     _logger.LogInformation("User created a new account with password.");
 
@@ -144,15 +171,15 @@ namespace KasundiRestaurant.Areas.Identity.Pages.Account
                     //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                     //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
+                    //if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    //{
+                    //    return RedirectToPage("RegisterConfirmation", new { email = Input.Email });
+                    //}
+                    //else
+                    //{
+
+
+                    //}
                 }
                 foreach (var error in result.Errors)
                 {
