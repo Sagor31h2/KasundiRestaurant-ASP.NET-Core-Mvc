@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace KasundiRestaurant.Areas.Admin.Controllers
-{[Area("Admin")]
+{
+    [Area("Admin")]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -19,9 +20,51 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var claimsIdentity = (ClaimsIdentity) this.User.Identity;
+            var claimsIdentity = (ClaimsIdentity)this.User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            return View(await _db.ApplicationUser.Where(c=>c.Id!=claim.Value).ToListAsync());
+            return View(await _db.ApplicationUser.Where(c => c.Id != claim.Value).ToListAsync());
+        }
+
+        public async Task<IActionResult> Lock(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var applicationUser = await _db.ApplicationUser.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            applicationUser.LockoutEnd = DateTime.Now.AddYears(1000);
+
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> UnLock(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var applicationUser = await _db.ApplicationUser.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            applicationUser.LockoutEnd = DateTime.Now;
+
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
