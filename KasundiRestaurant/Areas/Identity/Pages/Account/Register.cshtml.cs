@@ -142,9 +142,9 @@ namespace KasundiRestaurant.Areas.Identity.Pages.Account
                         }
                         else
                         {
-                            if (role == StaticDetails.ManagerUser)
+                            if (role == StaticDetails.KitchenUser)
                             {
-                                await _userManager.AddToRoleAsync(user, StaticDetails.ManagerUser);
+                                await _userManager.AddToRoleAsync(user, StaticDetails.KitchenUser);
                             }
                             else
                             {

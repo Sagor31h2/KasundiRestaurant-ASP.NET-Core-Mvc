@@ -66,5 +66,20 @@ namespace KasundiRestaurant.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id==null)
+            {
+                return NotFound();
+            }
+
+            var memberId = await _db.ApplicationUser.FindAsync(id);
+            _db.ApplicationUser.Remove(memberId);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+
+        }
     }
 }
