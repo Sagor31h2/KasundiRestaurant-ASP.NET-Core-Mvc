@@ -5,12 +5,16 @@ using System.Threading.Tasks;
 using KasundiRestaurant.Data;
 using KasundiRestaurant.Models;
 using KasundiRestaurant.Models.ViewModels;
+using KasundiRestaurant.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace KasundiRestaurant.Areas.Admin.Controllers
 {[Area("Admin")]
+    [Authorize(Roles = StaticDetails.ManagerUser)]
+
     public class SubCategoryController : Controller
     { 
         private readonly ApplicationDbContext _db;

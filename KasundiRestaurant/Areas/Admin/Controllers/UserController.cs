@@ -4,12 +4,16 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using KasundiRestaurant.Data;
+using KasundiRestaurant.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace KasundiRestaurant.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = StaticDetails.ManagerUser)]
+
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _db;
