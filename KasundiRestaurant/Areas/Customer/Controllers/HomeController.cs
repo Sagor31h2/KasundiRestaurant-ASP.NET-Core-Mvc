@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using KasundiRestaurant.Models;
 using KasundiRestaurant.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace KasundiRestaurant.Controllers
@@ -32,6 +33,21 @@ namespace KasundiRestaurant.Controllers
             };
             return View(IndexVM);
         }
+
+        [Authorize]
+        public async Task<IActionResult> Details(int id)
+        {
+            var menuItemFromDb = await _db.MenuItem.Include(c => c.Category)
+                .Include(c => c.SubCategory).Where(c => c.Id == id).FirstOrDefaultAsync();
+
+            ShoppingCart cartObj = new ShoppingCart()
+            {
+                MenuItem = menuItemFromDb,
+                MenuItemId = menuItemFromDb.Id
+            };
+            return View(cartObj);
+        }
+
 
         public IActionResult Privacy()
         {
